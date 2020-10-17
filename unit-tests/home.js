@@ -12,24 +12,28 @@ let checkFailureRate = new Rate('check_failure_rate');
 // you can specify stages of your test (ramp up/down patterns) through the options object
 // target is the number of VUs you are aiming for
 
-export const options = {
-  stages: [
-    { target: 20, duration: '3s' },
-    { target: 15, duration: '3s' },
-    { target: 0, duration: '3s' },
-  ],
+export let options = {
+  scenarios: {
+    demo_test: {
+      exec: 'demo',
+      executor: 'per-vu-iterations',
+      iterations: 5,
+      vus: 20,
+      tags: { scenario_name: 'demo_test' },
+    },
+  },
   thresholds: {
-    requests: ['count < 100'],
-    http_req_connecting: ['p(95)<450'],
-    'http_req_duration{staticAsset:yes}': ['p(95)<100'],
+    'requests{scenario_name:demo_test}': ['count < 100'],
+    'http_req_connecting{scenario_name:demo_test}': ['p(95)<450'],
+    'http_req_duration{scenario_name:demo_test}': ['p(95)<3000'],
     RTT: ['p(99)<300', 'p(70)<250', 'avg<200', 'med<150', 'min<100'],
     'Content OK': ['rate>0.95'],
     ContentSize: ['value<4000'],
-    Errors: ['count<100'],
+    'Errors{scenario_name:demo_test}': ['count<100'],
   },
 };
 
-export default function () {
+export function demo() {
   console.log(__VU, JSON.stringify(data[__VU - 1]));
   // our HTTP request, note that we are saving the response to res, which can be accessed later
   homeService(check, checkFailureRate);
