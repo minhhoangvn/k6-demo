@@ -1,0 +1,21 @@
+# This is a sample workflow that is auto run K6 after push request
+
+name: K6.io workflow
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on: [push]
+
+jobs:
+  k6_local_test:
+    name: k6 local test run - basic example
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Run local k6 test
+        uses: k6io/action@v0.1
+        with:
+          filename: unit-tests/home.js
