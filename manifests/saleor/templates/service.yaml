@@ -1,0 +1,82 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: '{{.Release.Name}}-saleor'
+    service: '{{.Release.Name}}-saleor-api'
+  name: '{{.Release.Name}}-saleor-api'
+spec:
+  ports:
+    - name: 'api'
+      port: 8000
+      targetPort: 8000
+  selector:
+    app: '{{.Release.Name}}-saleor'
+    service: '{{.Release.Name}}-saleor-api'
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: '{{.Release.Name}}-saleor'
+    service: '{{.Release.Name}}-saleor-dashboard'
+  name: '{{.Release.Name}}-saleor-dashboard'
+spec:
+  ports:
+    - name: 'dashboard'
+      port: 9000
+      targetPort: 9000
+  selector:
+    app: '{{.Release.Name}}-saleor'
+    service: '{{.Release.Name}}-saleor-dashboard'
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: '{{.Release.Name}}-saleor'
+    service: '{{.Release.Name}}-saleor-storefront'
+  name: '{{.Release.Name}}-saleor-storefront'
+spec:
+  ports:
+    - name: 'storefront'
+      port: 3000
+      targetPort: 3000
+  selector:
+    app: '{{.Release.Name}}-saleor'
+    service: '{{.Release.Name}}-saleor-storefront'
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  labels:
+    app: '{{.Release.Name}}-saleor'
+    service: '{{.Release.Name}}-saleor-ingress'
+  name: '{{.Release.Name}}-saleor'
+spec:
+  rules:
+    - host: '{{ .Values.apiIngress }}'
+      http:
+        paths:
+          - backend:
+              serviceName: '{{.Release.Name}}-saleor-api'
+              servicePort: 8000
+            pathType: ImplementationSpecific
+    - host: '{{ .Values.dashboardIngress }}'
+      http:
+        paths:
+          - backend:
+              serviceName: '{{.Release.Name}}-saleor-dashboard'
+              servicePort: 9000
+            pathType: ImplementationSpecific
+    - host: '{{ .Values.storefrontIngress }}'
+      http:
+        paths:
+          - backend:
+              serviceName: '{{.Release.Name}}-saleor-storefront'
+              servicePort: 3000
+            pathType: ImplementationSpecific

@@ -1,0 +1,140 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: '{{.Release.Name}}-saleor-api'
+  labels:
+    app: '{{.Release.Name}}-saleor'
+    service: '{{.Release.Name}}-saleor-api'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: '{{.Release.Name}}-saleor'
+      service: '{{.Release.Name}}-saleor-api'
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: '{{.Release.Name}}-saleor'
+        service: '{{.Release.Name}}-saleor-api'
+    spec:
+      restartPolicy: Always
+      containers:
+        - image: hnminh/saleor-api:2.10
+          name: saleor-api
+          imagePullPolicy: Always
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  [
+                    '/bin/sh',
+                    '-c',
+                    'python3 manage.py migrate && python3 manage.py collectstatic --noinput && python3 manage.py populatedb && python3 manage.py createsuperuser --no-input --email=admin@kms-technology.com || true && sleep 30',
+                  ]
+          command:
+            [
+              '/bin/sh',
+              '-c',
+              'python3 -m pip install django-redis django-debug-toolbar django-debug-toolbar-request-history django-graphiql-debug-toolbar && uwsgi --ini /app/saleor/wsgi/uwsgi.ini',
+            ]
+          ports:
+            - containerPort: 8000
+              name: api
+          env:
+            - name: ENABLE_DEBUG_TOOLBAR
+              value: 'True'
+            - name: DEBUG
+              value: 'True'
+            - name: DATABASE_URL
+              value: '{{ .Values.databaseUrl }}'
+            - name: CACHE_URL
+              value: '{{ .Values.redisUrl }}'
+            - name: ALLOWED_CLIENT_HOSTS
+              value: '{{ .Values.allowHosts }}, {{.Release.Name}}-saleor-dashboard, {{.Release.Name}}-saleor-storefront'
+            - name: ALLOWED_HOSTS
+              value: '{{ .Values.allowHosts }}, {{.Release.Name}}-saleor-dashboard, {{.Release.Name}}-saleor-storefront'
+            - name: SECRET_KEY
+              value: '{{ .Values.secretKey }}'
+            - name: DJANGO_SUPERUSER_PASSWORD
+              value: '{{ .Values.superUserPassword }}'
+            - name: DASHBOARD_URL
+              value: 'http://{{ .Values.dashboardIngress }}'
+            - name: STOREFRONT_URL
+              value: 'http://{{ .Values.storefrontIngress }}'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: '{{.Release.Name}}-saleor-dashboard'
+  labels:
+    app: '{{.Release.Name}}-saleor'
+    service: '{{.Release.Name}}-saleor-dashboard'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: '{{.Release.Name}}-saleor'
+      service: '{{.Release.Name}}-saleor-dashboard'
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: '{{.Release.Name}}-saleor'
+        service: '{{.Release.Name}}-saleor-dashboard'
+    spec:
+      restartPolicy: Always
+      containers:
+        - image: hnminh/saleor-dashboard:2.10
+          name: saleor-dashboard
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9000
+              name: dashboard
+          env:
+            - name: API_URI
+              value: 'http://{{.Release.Name}}-saleor-api:8000/graphql/'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: '{{.Release.Name}}-saleor-storefront'
+  labels:
+    app: '{{.Release.Name}}-saleor'
+    service: '{{.Release.Name}}-saleor-storefront'
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: '{{.Release.Name}}-saleor'
+      service: '{{.Release.Name}}-saleor-storefront'
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: '{{.Release.Name}}-saleor'
+        service: '{{.Release.Name}}-saleor-storefront'
+    spec:
+      restartPolicy: Always
+      containers:
+        - image: hnminh/saleor-storefront:2.10
+          name: saleor-storefront
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+              name: storefront
+          env:
+            - name: API_URI
+              value: 'http://{{.Release.Name}}-saleor-api:8000/graphql/'
