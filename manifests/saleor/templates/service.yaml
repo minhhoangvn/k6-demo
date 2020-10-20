@@ -26,8 +26,8 @@ metadata:
 spec:
   ports:
     - name: 'dashboard'
-      port: 9000
-      targetPort: 9000
+      port: 80
+      targetPort: 80
   selector:
     app: '{{.Release.Name}}-saleor'
     service: '{{.Release.Name}}-saleor-dashboard'
@@ -43,8 +43,8 @@ metadata:
 spec:
   ports:
     - name: 'storefront'
-      port: 3000
-      targetPort: 3000
+      port: 80
+      targetPort: 80
   selector:
     app: '{{.Release.Name}}-saleor'
     service: '{{.Release.Name}}-saleor-storefront'
@@ -71,12 +71,12 @@ spec:
         paths:
           - backend:
               serviceName: '{{.Release.Name}}-saleor-dashboard'
-              servicePort: 9000
+              servicePort: 80
             pathType: ImplementationSpecific
     - host: '{{ .Values.storefrontIngress }}'
       http:
         paths:
           - backend:
               serviceName: '{{.Release.Name}}-saleor-storefront'
-              servicePort: 3000
+              servicePort: 80
             pathType: ImplementationSpecific

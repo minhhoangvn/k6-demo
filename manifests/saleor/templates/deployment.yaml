@@ -93,15 +93,20 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-        - image: hnminh/saleor-dashboard:2.10
+        - image: hnminh/saleor-dashboard:kms
           name: saleor-dashboard
           imagePullPolicy: Always
+          # Image with debug mode need to config webpack-dev-server port
+          # command: ['/bin/sh']
+          # args: ['-c', 'npm start -- --port 80 --host 0.0.0.0 --disable-host-check']
           ports:
-            - containerPort: 9000
+            - containerPort: 80
               name: dashboard
           env:
+            - name: DANGEROUSLY_DISABLE_HOST_CHECK
+              value: 'true'
             - name: API_URI
-              value: 'http://{{.Release.Name}}-saleor-api:8000/graphql/'
+              value: 'http://{{ .Values.apiIngress }}/graphql/'
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -129,12 +134,17 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-        - image: hnminh/saleor-storefront:2.10
+        - image: hnminh/saleor-storefront:kms
           name: saleor-storefront
           imagePullPolicy: Always
+          # Image with debug mode need to config webpack-dev-server port
+          # command: ['/bin/sh']
+          # args: ['-c', 'npm start -- --port 80 --host 0.0.0.0 --disable-host-check']
           ports:
-            - containerPort: 3000
+            - containerPort: 80
               name: storefront
           env:
+            - name: DANGEROUSLY_DISABLE_HOST_CHECK
+              value: 'true'
             - name: API_URI
-              value: 'http://{{.Release.Name}}-saleor-api:8000/graphql/'
+              value: 'http://{{ .Values.apiIngress }}/graphql/'
