@@ -34,7 +34,7 @@ spec:
                   [
                     '/bin/sh',
                     '-c',
-                    'python3 manage.py migrate && python3 manage.py collectstatic --noinput && python3 manage.py populatedb && python3 manage.py createsuperuser --no-input --email=admin@kms-technology.com || true && sleep 30',
+                    'python3 manage.py migrate && python3 manage.py collectstatic --noinput && python3 manage.py populatedb && python3 manage.py populatedb --withoutimages && python3 manage.py populatedb --withoutimages && python3 manage.py populatedb --withoutimages && python3 manage.py populatedb --withoutimages&& python3 manage.py populatedb --withoutimages && python3 manage.py populatedb --withoutimages && python3 manage.py populatedb --withoutimages && python3 manage.py createsuperuser --no-input --email=admin@kms-technology.com || true && sleep 30',
                   ]
           command:
             [
