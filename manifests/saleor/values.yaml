@@ -16,7 +16,7 @@ saleor:
 #################### pgadmin4 #################################
 ###############################################################
 pgadmin4:
-  enabled: false
+  enabled: true
   env:
     email: coe@email.com
     password: 'Coe@2020'
@@ -62,7 +62,7 @@ pgadmin4:
 #################### Nginx Ingress ############################
 ###############################################################
 nginx-ingress-controller:
-  enabled: false
+  enabled: true
   commonAnnotations:
     scrape-metric: 'true'
   service:
@@ -98,7 +98,7 @@ nginx-ingress-controller:
 #################### NFS Client ###############################
 ###############################################################
 nfs-client-provisioner:
-  enabled: false
+  enabled: true
   nfs:
     server: 192.168.1.1
     path: /mnt/sharedfolder
@@ -126,7 +126,7 @@ nfs-client-provisioner:
 #################### Postgresql ###############################
 ###############################################################
 postgresql:
-  enabled: false
+  enabled: true
   image:
     debug: true
   global:
@@ -160,7 +160,7 @@ postgresql:
 ################### Redis ####################################
 ##############################################################
 redis:
-  enabled: false
+  enabled: true
   global:
     storageClass: 'default'
   usePassword: false
