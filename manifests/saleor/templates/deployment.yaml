@@ -6,15 +6,15 @@ metadata:
     app: '{{.Release.Name}}-saleor'
     service: '{{.Release.Name}}-saleor-api'
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: '{{.Release.Name}}-saleor'
       service: '{{.Release.Name}}-saleor-api'
   strategy:
     rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
+      maxSurge: 2
+      maxUnavailable: 1
     type: RollingUpdate
   template:
     metadata:
@@ -24,7 +24,7 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-        - image: hnminh/saleor-api:2.10
+        - image: hnminh/saleor-api:kms
           name: saleor-api
           imagePullPolicy: Always
           lifecycle:
@@ -34,14 +34,8 @@ spec:
                   [
                     '/bin/sh',
                     '-c',
-                    'python3 manage.py migrate && python3 manage.py collectstatic --noinput && python3 manage.py populatedb && python3 manage.py populatedb --withoutimages && python3 manage.py populatedb --withoutimages && python3 manage.py populatedb --withoutimages && python3 manage.py populatedb --withoutimages&& python3 manage.py populatedb --withoutimages && python3 manage.py populatedb --withoutimages && python3 manage.py populatedb --withoutimages && python3 manage.py createsuperuser --no-input --email=admin@kms-technology.com || true && sleep 30',
+                    'python3 manage.py migrate && python3 manage.py collectstatic --noinput && python3 manage.py populatedb && python3 manage.py createsuperuser --no-input --email=admin@kms-technology.com || true && python3 manage.py createsuperuser --no-input --email=minhhoang@kms-technology.com || true && echo "UPDATE public.warehouse_stock SET quantity = 2147483647" | python3 manage.py dbshell && sleep 30',
                   ]
-          command:
-            [
-              '/bin/sh',
-              '-c',
-              'python3 -m pip install django-redis django-debug-toolbar django-debug-toolbar-request-history django-graphiql-debug-toolbar && uwsgi --ini /app/saleor/wsgi/uwsgi.ini',
-            ]
           ports:
             - containerPort: 8000
               name: api
@@ -66,6 +60,14 @@ spec:
               value: 'http://{{ .Values.dashboardIngress }}'
             - name: STOREFRONT_URL
               value: 'http://{{ .Values.storefrontIngress }}'
+          resources:
+            limits:
+              cpu: '250m'
+              memory: '250Mi'
+            requests:
+              cpu: '250m'
+              memory: '250Mi'
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -75,7 +77,7 @@ metadata:
     app: '{{.Release.Name}}-saleor'
     service: '{{.Release.Name}}-saleor-dashboard'
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: '{{.Release.Name}}-saleor'
@@ -83,7 +85,7 @@ spec:
   strategy:
     rollingUpdate:
       maxSurge: 1
-      maxUnavailable: 0
+      maxUnavailable: 1
     type: RollingUpdate
   template:
     metadata:
@@ -107,6 +109,13 @@ spec:
               value: 'true'
             - name: API_URI
               value: 'http://{{ .Values.apiIngress }}/graphql/'
+          resources:
+            limits:
+              cpu: '150m'
+              memory: '150Mi'
+            requests:
+              cpu: '150m'
+              memory: '150Mi'
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -116,7 +125,7 @@ metadata:
     app: '{{.Release.Name}}-saleor'
     service: '{{.Release.Name}}-saleor-storefront'
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: '{{.Release.Name}}-saleor'
@@ -124,7 +133,7 @@ spec:
   strategy:
     rollingUpdate:
       maxSurge: 1
-      maxUnavailable: 0
+      maxUnavailable: 1
     type: RollingUpdate
   template:
     metadata:
@@ -148,3 +157,10 @@ spec:
               value: 'true'
             - name: API_URI
               value: 'http://{{ .Values.apiIngress }}/graphql/'
+          resources:
+            limits:
+              cpu: '150m'
+              memory: '150Mi'
+            requests:
+              cpu: '150m'
+              memory: '150Mi'
