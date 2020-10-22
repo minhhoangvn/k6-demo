@@ -15,6 +15,7 @@ spec:
     app: '{{.Release.Name}}-saleor'
     service: '{{.Release.Name}}-saleor-api'
   type: ClusterIP
+  clusterIP: None
 ---
 apiVersion: v1
 kind: Service

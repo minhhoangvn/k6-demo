@@ -1,0 +1,57 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: '{{ .Release.Name }}-setup-database'
+  annotations:
+    'helm.sh/hook': pre-install
+    'helm.sh/hook-delete-policy': hook-succeeded
+    'helm.sh/hook-weight': '0'
+spec:
+  template:
+    metadata:
+      name: '{{ .Release.Name }}-setup-database'
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: config-database
+          image: 'hnminh/saleor-api:kms'
+          imagePullPolicy: Always
+          command:
+            [
+              '/bin/sh',
+              '-c',
+              'python3 manage.py migrate && echo yes | python3 manage.py collectstatic && python3 manage.py populatedb && python manage.py create_thumbnails && python3 manage.py createsuperuser --no-input --email=admin@kms-technology.com || true && python3 manage.py createsuperuser --no-input --email=minhhoang@kms-technology.com || true && echo "UPDATE public.warehouse_stock SET quantity = 2147483647" | python3 manage.py dbshell',
+            ]
+          env:
+            - name: ENABLE_DEBUG_TOOLBAR
+              value: 'True'
+            - name: DEBUG
+              value: 'True'
+            - name: DATABASE_URL
+              value: '{{ .Values.databaseUrl }}'
+            - name: CACHE_URL
+              value: '{{ .Values.redisUrl }}'
+            - name: ALLOWED_CLIENT_HOSTS
+              value: '{{ .Values.allowHosts }}, {{.Release.Name}}-saleor-dashboard, {{.Release.Name}}-saleor-storefront'
+            - name: ALLOWED_HOSTS
+              value: '{{ .Values.allowHosts }}, {{.Release.Name}}-saleor-dashboard, {{.Release.Name}}-saleor-storefront'
+            - name: SECRET_KEY
+              value: '{{ .Values.secretKey }}'
+            - name: DJANGO_SUPERUSER_PASSWORD
+              value: '{{ .Values.superUserPassword }}'
+            - name: DASHBOARD_URL
+              value: 'http://{{ .Values.dashboardIngress }}'
+            - name: STOREFRONT_URL
+              value: 'http://{{ .Values.storefrontIngress }}'
+          volumeMounts:
+            - mountPath: /app/media
+              name: media-storage
+            - mountPath: /app/static
+              name: static-storage
+      volumes:
+        - name: media-storage
+          persistentVolumeClaim:
+            claimName: 'storage-{{.Release.Name}}-saleor-media'
+        - name: static-storage
+          persistentVolumeClaim:
+            claimName: 'storage-{{.Release.Name}}-saleor-static'

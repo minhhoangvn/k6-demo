@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: '{{.Release.Name}}-saleor-api'
   labels:
@@ -7,14 +7,12 @@ metadata:
     service: '{{.Release.Name}}-saleor-api'
 spec:
   replicas: 3
+  serviceName: '{{.Release.Name}}-saleor-api'
   selector:
     matchLabels:
       app: '{{.Release.Name}}-saleor'
       service: '{{.Release.Name}}-saleor-api'
-  strategy:
-    rollingUpdate:
-      maxSurge: 2
-      maxUnavailable: 1
+  updateStrategy:
     type: RollingUpdate
   template:
     metadata:
@@ -27,15 +25,6 @@ spec:
         - image: hnminh/saleor-api:kms
           name: saleor-api
           imagePullPolicy: Always
-          lifecycle:
-            postStart:
-              exec:
-                command:
-                  [
-                    '/bin/sh',
-                    '-c',
-                    'python3 manage.py migrate && python3 manage.py collectstatic --noinput && python3 manage.py populatedb && python3 manage.py createsuperuser --no-input --email=admin@kms-technology.com || true && python3 manage.py createsuperuser --no-input --email=minhhoang@kms-technology.com || true && echo "UPDATE public.warehouse_stock SET quantity = 2147483647" | python3 manage.py dbshell && sleep 30',
-                  ]
           ports:
             - containerPort: 8000
               name: api
@@ -63,10 +52,22 @@ spec:
           resources:
             limits:
               cpu: '250m'
-              memory: '250Mi'
+              memory: '2Gi'
             requests:
               cpu: '250m'
-              memory: '250Mi'
+              memory: '2Gi'
+          volumeMounts:
+            - mountPath: /app/media
+              name: media-storage
+            - mountPath: /app/static
+              name: static-storage
+      volumes:
+        - name: media-storage
+          persistentVolumeClaim:
+            claimName: 'storage-{{.Release.Name}}-saleor-media'
+        - name: static-storage
+          persistentVolumeClaim:
+            claimName: 'storage-{{.Release.Name}}-saleor-static'
 
 ---
 apiVersion: apps/v1
