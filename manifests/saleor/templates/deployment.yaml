@@ -30,25 +30,35 @@ spec:
               name: api
           env:
             - name: ENABLE_DEBUG_TOOLBAR
-              value: 'True'
+              value: '{{ .Values.saleor.debugToolBar }}'
             - name: DEBUG
-              value: 'True'
+              value: '{{ .Values.saleor.debug }}'
+            {{ if .Values.postgresql.enabled }}
             - name: DATABASE_URL
-              value: '{{ .Values.databaseUrl }}'
+              value: postgres://{{ .Values.postgresql.postgresqlUsername }}:{{ .Values.postgresql.postgresqlPassword }}@{{.Release.Name}}-postgresql-headless.default:5432/postgres'
+            {{ else }}
+            - name: DATABASE_URL
+              value: '{{ .Values.saleor.databaseUrl }}'
+            {{ end }}
+            {{ if .Values.redis.enabled }}
             - name: CACHE_URL
-              value: '{{ .Values.redisUrl }}'
+              value: 'redis://{{.Release.Name}}-redis-headless.default:6379/0'
+            {{ else }}
+            - name: CACHE_URL
+              value: '{{ .Values.saleor.redisUrl }}'
+            {{ end }}
             - name: ALLOWED_CLIENT_HOSTS
-              value: '{{ .Values.allowHosts }}, {{.Release.Name}}-saleor-dashboard, {{.Release.Name}}-saleor-storefront'
+              value: '{{ .Values.saleor.allowHosts }}, {{.Release.Name}}-saleor-dashboard, {{.Release.Name}}-saleor-storefront'
             - name: ALLOWED_HOSTS
-              value: '{{ .Values.allowHosts }}, {{.Release.Name}}-saleor-dashboard, {{.Release.Name}}-saleor-storefront'
+              value: '{{ .Values.saleor.allowHosts }}, {{.Release.Name}}-saleor-dashboard, {{.Release.Name}}-saleor-storefront'
             - name: SECRET_KEY
-              value: '{{ .Values.secretKey }}'
+              value: '{{ .Values.saleor.secretKey }}'
             - name: DJANGO_SUPERUSER_PASSWORD
-              value: '{{ .Values.superUserPassword }}'
+              value: '{{ .Values.saleor.superUserPassword }}'
             - name: DASHBOARD_URL
-              value: 'http://{{ .Values.dashboardIngress }}'
+              value: 'http://{{ .Values.saleor.dashboardIngress }}'
             - name: STOREFRONT_URL
-              value: 'http://{{ .Values.storefrontIngress }}'
+              value: 'http://{{ .Values.saleor.storefrontIngress }}'
           resources:
             limits:
               cpu: '250m'
@@ -109,7 +119,7 @@ spec:
             - name: DANGEROUSLY_DISABLE_HOST_CHECK
               value: 'true'
             - name: API_URI
-              value: 'http://{{ .Values.apiIngress }}/graphql/'
+              value: 'http://{{ .Values.saleor.apiIngress }}/graphql/'
           resources:
             limits:
               cpu: '150m'
@@ -157,7 +167,7 @@ spec:
             - name: DANGEROUSLY_DISABLE_HOST_CHECK
               value: 'true'
             - name: API_URI
-              value: 'http://{{ .Values.apiIngress }}/graphql/'
+              value: 'http://{{ .Values.saleor.apiIngress }}/graphql/'
           resources:
             limits:
               cpu: '150m'

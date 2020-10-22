@@ -62,7 +62,7 @@ metadata:
   name: '{{.Release.Name}}-saleor-api'
 spec:
   rules:
-    - host: '{{ .Values.apiIngress }}'
+    - host: '{{ .Values.saleor.apiIngress }}'
       http:
         paths:
           - backend:
@@ -81,7 +81,7 @@ metadata:
   name: '{{.Release.Name}}-saleor-dashboard'
 spec:
   rules:
-    - host: '{{ .Values.dashboardIngress }}'
+    - host: '{{ .Values.saleor.dashboardIngress }}'
       http:
         paths:
           - backend:
@@ -100,7 +100,7 @@ metadata:
   name: '{{.Release.Name}}-saleor-storefront'
 spec:
   rules:
-    - host: '{{ .Values.storefrontIngress }}'
+    - host: '{{ .Values.saleor.storefrontIngress }}'
       http:
         paths:
           - backend:
