@@ -2,9 +2,9 @@ var check = require('k6').check;
 var Counter = require('k6/metrics').Counter;
 var Rate = require('k6/metrics').Rate;
 var Trend = require('k6/metrics').Trend;
-var apiService = require('../services/home.js').apiService;
-var storefrontService = require('../services/home.js').storefrontService;
-var dashboardService = require('../services/home.js').dashboardService;
+var apiHomePageRequest = require('../services/home.js').apiHomePageRequest;
+var storefrontHomePageRequest = require('../services/home.js').storefrontHomePageRequest;
+var dashboardHomePageRequest = require('../services/home.js').dashboardHomePageRequest;
 var papaparse = require('https://jslib.k6.io/papaparse/5.1.1/index.js');
 
 var data = papaparse.parse(open('../data/sample.csv'), { header: true }).data;
@@ -25,8 +25,8 @@ var dashboardTrend = new Trend('dashboard_waiting_timing');
 var storefrontTrend = new Trend('storefront_waiting_timing');
 // you can specify stages of your test (ramp up/down patterns) through the options object
 // target is the number of VUs you are aiming for
-var DURATION = '30s';
-var VUs = 2000;
+var DURATION = '10s';
+var VUs = 1;
 
 var thresholdConfig = {
   'http_req_connecting{scenario_name:api_test}': ['p(90)<450'],
@@ -83,19 +83,26 @@ module.exports.options = {
     dashboard_test: dashboardTestScenario,
     storefront_test: storefrontTestScenario,
   },
+  thresholds: thresholdConfig,
 };
 
 module.exports.api = function () {
   // our HTTP request, note that we are saving the response to res, which can be accessed later
-  apiService(check, checkFailureAPIRate, apiErrors, apiTrend);
+  apiHomePageRequest(check, checkFailureAPIRate, apiErrors, apiTrend, 1);
 };
 
 module.exports.dashboard = function () {
   // our HTTP request, note that we are saving the response to res, which can be accessed later
-  dashboardService(check, checkFailureDashboardRate, dashboardErrors, dashboardTrend);
+  dashboardHomePageRequest(check, checkFailureDashboardRate, dashboardErrors, dashboardTrend, 1);
 };
 
 module.exports.storefront = function () {
   // our HTTP request, note that we are saving the response to res, which can be accessed later
-  storefrontService(check, checkFailureStoreFrontRate, storefrontErrors, storefrontTrend);
+  storefrontHomePageRequest(
+    check,
+    checkFailureStoreFrontRate,
+    storefrontErrors,
+    storefrontTrend,
+    1
+  );
 };
