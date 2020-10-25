@@ -1,18 +1,17 @@
 var http = require('k6/http');
 var sleep = require('k6').sleep;
 var group = require('k6').group;
-var jsonpath = require('https://jslib.k6.io/jsonpath/1.0.2/index.js');
 var verify = require('./validations.js');
 var metrics = require('./metrics.js');
 var GLOBAL_VARS = require('../../helper/constant.js');
 
-var addPermittedCommunicationRequest = function () {
+var selectItemPermittedCommunicationRequest = function () {
   return http.options(GLOBAL_VARS.TARGET_URL, null, {
     headers: GLOBAL_VARS.DEFAULT_OPTIONS_HEADERS,
   });
 };
 
-var addRequest = function (variantId) {
+var selectItemRequest = function (variantId) {
   return http.post(
     GLOBAL_VARS.TARGET_URL,
     '[{"operationName":"CheckoutProductVariants","variables":{"ids":["' +
@@ -23,3 +22,62 @@ var addRequest = function (variantId) {
     }
   );
 };
+
+var selectItemAction = function (
+  searchItemString,
+  variantId,
+  check,
+  checkFailureRate,
+  counter,
+  trend,
+  sleepTime,
+  actionName
+) {
+  var response = selectItemPermittedCommunicationRequest();
+  metrics.addCheckFailuerRate(
+    response,
+    verify.verifyStatusCode(response, counter, actionName),
+    true,
+    check,
+    checkFailureRate,
+    actionName
+  );
+  metrics.addTimmingTrend(response, trend, actionName);
+  response = selectItemRequest(variantId);
+  metrics.addCheckFailuerRate(
+    response,
+    verify.verifyStatusCode(response, counter, actionName),
+    verify.verifyCorrectResponseDataLoadTest(response, searchItemString, counter, actionName),
+    check,
+    checkFailureRate,
+    actionName
+  );
+  sleep(sleepTime);
+};
+
+var selectItemFlow = function (
+  searchItemString,
+  variantId,
+  check,
+  checkFailureRate,
+  counter,
+  trend,
+  sleepTime
+) {
+  return group('Select Item Flow', function () {
+    selectItemAction(
+      searchItemString,
+      variantId,
+      check,
+      checkFailureRate,
+      counter,
+      trend,
+      sleepTime,
+      'Select Item ' + searchItemString
+    );
+  });
+};
+
+module.exports.selectItemPermittedCommunicationRequest = selectItemPermittedCommunicationRequest;
+module.exports.selectItemRequest = selectItemRequest;
+module.exports.selectItemFlow = selectItemFlow;

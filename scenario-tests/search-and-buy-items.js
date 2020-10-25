@@ -3,8 +3,9 @@ var Counter = require('k6/metrics').Counter;
 var Rate = require('k6/metrics').Rate;
 var Trend = require('k6/metrics').Trend;
 var search = require('../services/search-items/index.js');
+var select = require('../services/select-items/index.js');
 
-var DURATION = '10s';
+var ITERATION = 50;
 var VUs = 1;
 var thresholdConfig = {
   'Content OK': ['rate > 0.95'],
@@ -74,21 +75,10 @@ var waitingTimingTrend = new Trend('check_waiting_timing');
 var buyItemWithUnregisterUserTestScenario = {
   exec: 'buyItemWithUnregisterUser',
   executor: 'per-vu-iterations',
-  iterations: 1,
-  //duration: DURATION,
+  iterations: ITERATION,
   vus: VUs,
   startTime: '0s',
   tags: { scenario_name: 'unregister_user' },
-};
-
-var buyItemWithRegisterUserTestScenario = {
-  exec: 'buyItemWithUnregisterUser',
-  executor: 'per-vu-iterations',
-  iterations: 1,
-  //duration: DURATION,
-  vus: VUs,
-  startTime: '0s',
-  tags: { scenario_name: 'register_user' },
 };
 
 module.exports.options = {
@@ -101,6 +91,15 @@ module.exports.options = {
 module.exports.buyItemWithUnregisterUser = function () {
   var searchDynamicId = search.searchAndSelectItemFlow(
     'Code Division T-shirt',
+    check,
+    checkFailureRate,
+    countErrors,
+    waitingTimingTrend,
+    1
+  );
+  select.selectItemFlow(
+    'Code Division T-shirt',
+    searchDynamicId.variantId,
     check,
     checkFailureRate,
     countErrors,

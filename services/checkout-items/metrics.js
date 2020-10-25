@@ -14,11 +14,11 @@ var addCheckFailuerRate = function (
       return verifyCorrectResponseData;
     },
   });
-  checkFailureRate.add(!checkRes, { group: 'Add', userAction: actionName });
+  checkFailureRate.add(!checkRes, { group: 'Checkout', userAction: actionName });
 };
 
 var addTimmingTrend = function (res, trend, actionName) {
-  trend.add(res.timings.waiting, { group: 'Add', userAction: actionName });
+  trend.add(res.timings.waiting, { group: 'Checkout', userAction: actionName });
 };
 
 module.exports.addCheckFailuerRate = addCheckFailuerRate;

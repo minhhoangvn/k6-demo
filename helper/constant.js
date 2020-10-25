@@ -1,5 +1,6 @@
+// Can be dynamic with __ENV
 module.exports = {
-  TARGET_URL: 'https://demo.saleor.io/graphql/',
+  TARGET_URL: 'http://saleor.testing.coe.com/graphql/',
   STORE_FRONT_URL: 'http://saleor-storefront.testing.coe.com/',
   DASHBOARD_URL: 'http://saleor-dashboard.testing.coe.com/dashboard/',
   GRAPHQL_URL: 'http://saleor.testing.coe.com/graphql',
