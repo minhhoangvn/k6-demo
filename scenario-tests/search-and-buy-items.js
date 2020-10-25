@@ -2,8 +2,7 @@ var check = require('k6').check;
 var Counter = require('k6/metrics').Counter;
 var Rate = require('k6/metrics').Rate;
 var Trend = require('k6/metrics').Trend;
-var GLOBAL_VARS = require('../helper/constant.js');
-var searchRequest = require('../services/search-item.js').searchRequest;
+var search = require('../services/search-items/index.js');
 
 var DURATION = '10s';
 var VUs = 1;
@@ -36,26 +35,26 @@ var thresholdConfig = {
     'med < 450',
   ],
   // Search Shirt
-  'http_req_connecting{userAction:searchShirt}': ['p(90) < 450'],
-  'http_req_duration{userAction:searchShirt}': ['p(90) < 4500'],
-  'http_reqs{userAction:searchShirt}': ['count >= 1'],
-  'checks{userAction:searchShirt}': ['rate > 0.9'],
-  'check_failure_rate{userAction:searchShirt}': ['rate < 0.1'],
-  'check_errors{userAction:searchShirt}': ['count < 5'],
-  'check_waiting_timing{userAction:searchShirt}': [
+  'http_req_connecting{userAction:Search Code Division T-shirt}': ['p(90) < 450'],
+  'http_req_duration{userAction:Search Code Division T-shirt}': ['p(90) < 4500'],
+  'http_reqs{userAction:Search Code Division T-shirt}': ['count >= 1'],
+  'checks{userAction:Search Code Division T-shirt}': ['rate > 0.9'],
+  'check_failure_rate{userAction:Search Code Division T-shirt}': ['rate < 0.1'],
+  'check_errors{userAction:Search Code Division T-shirt}': ['count < 5'],
+  'check_waiting_timing{userAction:Search Code Division T-shirt}': [
     'p(90) < 600',
     'p(70) < 500',
     'avg < 450',
     'med < 450',
   ],
   // Search Wine
-  'http_req_connecting{userAction:searchWine}': ['p(90) < 450'],
-  'http_req_duration{userAction:searchWine}': ['p(90) < 4500'],
-  'http_reqs{userAction:searchWine}': ['count >= 1'],
-  'checks{userAction:searchWine}': ['rate > 0.9'],
-  'check_failure_rate{userAction:searchWine}': ['rate < 0.1'],
-  'check_errors{userAction:searchWine}': ['count < 5'],
-  'check_waiting_timing{userAction:searchWine}': [
+  'http_req_connecting{userAction:Select Code Division T-shirt}': ['p(90) < 450'],
+  'http_req_duration{userAction:Select Code Division T-shirt}': ['p(90) < 4500'],
+  'http_reqs{userAction:Select Code Division T-shirt}': ['count >= 1'],
+  'checks{userAction:Select Code Division T-shirt}': ['rate > 0.9'],
+  'check_failure_rate{userAction:Select Code Division T-shirt}': ['rate < 0.1'],
+  'check_errors{userAction:Select Code Division T-shirt}': ['count < 5'],
+  'check_waiting_timing{userAction:Select Code Division T-shirt}': [
     'p(90) < 600',
     'p(70) < 500',
     'avg < 450',
@@ -100,6 +99,13 @@ module.exports.options = {
 };
 
 module.exports.buyItemWithUnregisterUser = function () {
-  var searchDynamicId = searchRequest(check, checkFailureRate, countErrors, waitingTimingTrend, 1);
+  var searchDynamicId = search.searchAndSelectItemFlow(
+    'Code Division T-shirt',
+    check,
+    checkFailureRate,
+    countErrors,
+    waitingTimingTrend,
+    1
+  );
   console.log(JSON.stringify(searchDynamicId));
 };
