@@ -50,7 +50,7 @@ var searchAction = function (
   );
   metrics.addTimmingTrend(response, trend, actionName);
   sleep(sleepTime);
-  if (response.status != 502)
+  if (response.status === 200 || response.status === 204)
     return jsonpath.query(response.json(), '$[0].data.products.edges[0].node.id')[0];
   return undefined;
 };
@@ -76,7 +76,7 @@ var selectSearchAction = function (
   );
   metrics.addTimmingTrend(response, trend, actionName);
   sleep(sleepTime);
-  if (response.status != 502)
+  if (response.status === 200 || response.status === 204)
     return jsonpath.query(response.json(), '$[0].data.product.variants[0].id')[0];
   return undefined;
 };

@@ -8,7 +8,7 @@ var select = require('../services/select-items/index.js');
 var account = require('../services/create-accounts/index.js');
 
 var ITERATION = 2;
-var VUs = 20;
+var VUs = 100;
 var thresholdConfig = {
   'Content OK': ['rate > 0.95'],
   // scenario 1
