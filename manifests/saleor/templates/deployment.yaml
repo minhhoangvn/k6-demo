@@ -6,7 +6,7 @@ metadata:
     app: '{{.Release.Name}}-saleor'
     service: '{{.Release.Name}}-saleor-api'
 spec:
-  replicas: 3
+  replicas: 6
   serviceName: '{{.Release.Name}}-saleor-api'
   selector:
     matchLabels:
@@ -25,10 +25,16 @@ spec:
         - image: hnminh/saleor-api:kms
           name: saleor-api
           imagePullPolicy: Always
+          command: ['uwsgi']
+          args: ["--enable-threads", "--reload-on-rss", "450", "--vacuum", "--harakiri","45","--max-requests","1000", "--ini", "/app/saleor/wsgi/uwsgi.ini"]
           ports:
             - containerPort: 8000
               name: api
           env:
+            - name: ENABLE_ACCOUNT_CONFIRMATION_BY_EMAIL
+              value: '{{ .Values.saleor.confirmationByEmail }}'
+            - name: ALLOWED_GRAPHQL_ORIGINS
+              value: '*'
             - name: ENABLE_DEBUG_TOOLBAR
               value: '{{ .Values.saleor.debugToolBar }}'
             - name: DEBUG
@@ -62,10 +68,10 @@ spec:
           resources:
             limits:
               cpu: '250m'
-              memory: '2Gi'
+              memory: '512Mi'
             requests:
               cpu: '250m'
-              memory: '2Gi'
+              memory: '512Mi'
           volumeMounts:
             - mountPath: /app/media
               name: media-storage
@@ -88,7 +94,7 @@ metadata:
     app: '{{.Release.Name}}-saleor'
     service: '{{.Release.Name}}-saleor-dashboard'
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: '{{.Release.Name}}-saleor'
@@ -96,7 +102,7 @@ spec:
   strategy:
     rollingUpdate:
       maxSurge: 1
-      maxUnavailable: 1
+      maxUnavailable: 0
     type: RollingUpdate
   template:
     metadata:
@@ -136,7 +142,7 @@ metadata:
     app: '{{.Release.Name}}-saleor'
     service: '{{.Release.Name}}-saleor-storefront'
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: '{{.Release.Name}}-saleor'
@@ -144,7 +150,7 @@ spec:
   strategy:
     rollingUpdate:
       maxSurge: 1
-      maxUnavailable: 1
+      maxUnavailable: 0
     type: RollingUpdate
   template:
     metadata:

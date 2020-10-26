@@ -6,17 +6,18 @@ saleor:
   redisUrl: 'redis://coe-redis-headless.default:6379/0'
   superUserPassword: 'Coe@2020'
   secretKey: 'Coe@2020'
-  allowHosts: 'localhost, 127.0.0.1, 0.0.0.0, 192.168.10.69, saleor.testing.coe.com'
+  allowHosts: 'localhost, 127.0.0.1, 0.0.0.0, 192.168.10.69, saleor.testing.coe.com,saleor-dashboard.testing.coe.com,saleor-storefront.testing.coe.com'
   apiIngress: 'saleor.testing.coe.com'
   dashboardIngress: 'saleor-dashboard.testing.coe.com'
   storefrontIngress: 'saleor-storefront.testing.coe.com'
   debugToolBar: 'True'
   debug: 'True'
+  confirmationByEmail: 'False'
 ###############################################################
 #################### pgadmin4 #################################
 ###############################################################
 pgadmin4:
-  enabled: true
+  enabled: false
   env:
     email: coe@email.com
     password: 'Coe@2020'
@@ -62,7 +63,7 @@ pgadmin4:
 #################### Nginx Ingress ############################
 ###############################################################
 nginx-ingress-controller:
-  enabled: true
+  enabled: false
   commonAnnotations:
     scrape-metric: 'true'
   service:
@@ -98,7 +99,7 @@ nginx-ingress-controller:
 #################### NFS Client ###############################
 ###############################################################
 nfs-client-provisioner:
-  enabled: true
+  enabled: false
   nfs:
     server: 192.168.1.1
     path: /mnt/sharedfolder
@@ -126,7 +127,7 @@ nfs-client-provisioner:
 #################### Postgresql ###############################
 ###############################################################
 postgresql:
-  enabled: true
+  enabled: false
   image:
     debug: true
   global:
@@ -160,7 +161,7 @@ postgresql:
 ################### Redis ####################################
 ##############################################################
 redis:
-  enabled: true
+  enabled: false
   global:
     storageClass: 'default'
   usePassword: false

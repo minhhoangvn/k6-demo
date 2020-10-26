@@ -50,7 +50,8 @@ var searchAction = function (
   );
   metrics.addTimmingTrend(response, trend, actionName);
   sleep(sleepTime);
-  return jsonpath.query(response.json(), '$[0].data.products.edges[0].node.id')[0];
+  var jsonData = response.json();
+  return jsonData && jsonpath.query(jsonData, '$[0].data.products.edges[0].node.id')[0];
 };
 
 var selectSearchAction = function (
@@ -74,7 +75,8 @@ var selectSearchAction = function (
   );
   metrics.addTimmingTrend(response, trend, actionName);
   sleep(sleepTime);
-  return jsonpath.query(response.json(), '$[0].data.product.variants[0].id')[0];
+  var jsonData = response.json();
+  return jsonData && jsonpath.query(jsonData, '$[0].data.product.variants[0].id')[0];
 };
 
 var searchAndSelectItemFlow = function (
