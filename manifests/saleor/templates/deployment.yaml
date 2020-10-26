@@ -6,7 +6,7 @@ metadata:
     app: '{{.Release.Name}}-saleor'
     service: '{{.Release.Name}}-saleor-api'
 spec:
-  replicas: 6
+  replicas: 8
   serviceName: '{{.Release.Name}}-saleor-api'
   selector:
     matchLabels:
@@ -66,10 +66,10 @@ spec:
           resources:
             limits:
               cpu: '500m'
-              memory: '1Gi'
+              memory: '512Mi'
             requests:
               cpu: '500m'
-              memory: '1Gi'
+              memory: '512Mi'
           volumeMounts:
             - mountPath: /app/media
               name: media-storage
