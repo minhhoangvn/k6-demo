@@ -26,7 +26,7 @@ spec:
           name: saleor-api
           imagePullPolicy: Always
           command: ['uwsgi']
-          args: ["--enable-threads", "--reload-on-rss", "1536", "--vacuum", "--harakiri","45","--max-requests","1000", "--ini", "/app/saleor/wsgi/uwsgi.ini"]
+          args: ["--enable-threads", "--reload-on-rss", "1536", "--vacuum", "--harakiri","120","--max-requests","1000", "--ini", "/app/saleor/wsgi/uwsgi.ini"]
           ports:
             - containerPort: 8000
               name: api

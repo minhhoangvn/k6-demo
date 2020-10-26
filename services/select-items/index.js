@@ -65,16 +65,17 @@ var selectItemFlow = function (
   sleepTime
 ) {
   return group('Select Item Flow', function () {
-    selectItemAction(
-      searchItemString,
-      variantId,
-      check,
-      checkFailureRate,
-      counter,
-      trend,
-      sleepTime,
-      'Select Item ' + searchItemString
-    );
+    variantId &&
+      selectItemAction(
+        searchItemString,
+        variantId,
+        check,
+        checkFailureRate,
+        counter,
+        trend,
+        sleepTime,
+        'Select Item ' + searchItemString
+      );
   });
 };
 

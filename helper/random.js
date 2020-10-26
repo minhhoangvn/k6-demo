@@ -30,5 +30,5 @@ module.exports.getRandomNumber = function (length) {
 };
 
 module.exports.getRandomEmail = function () {
-  return random.getRandomName() + random.getRandomNumber(24) + 'perf@kms.testing.coe.com';
+  return random.getRandomName() + random.getRandomNumber(12) + 'perf@kms.testing.coe.com';
 };
