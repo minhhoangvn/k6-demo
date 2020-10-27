@@ -6,7 +6,7 @@ metadata:
     app: '{{.Release.Name}}-saleor'
     service: '{{.Release.Name}}-saleor-api'
 spec:
-  replicas: 8
+  replicas: 4
   serviceName: '{{.Release.Name}}-saleor-api'
   selector:
     matchLabels:
