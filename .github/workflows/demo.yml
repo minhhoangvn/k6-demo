@@ -18,4 +18,4 @@ jobs:
       - name: Run local k6 test
         uses: k6io/action@v0.1
         with:
-          filename: unit-tests/home.js
+          filename: scenario-tests/search-and-buy-items.js
