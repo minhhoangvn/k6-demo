@@ -11,6 +11,9 @@ spec:
     - name: 'api'
       port: 8000
       targetPort: 8000
+    - name: 'metrics'
+      port: 9191
+      targetPort: 9191
   selector:
     app: '{{.Release.Name}}-saleor'
     service: '{{.Release.Name}}-saleor-api'

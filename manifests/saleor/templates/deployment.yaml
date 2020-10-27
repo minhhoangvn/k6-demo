@@ -22,12 +22,14 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-        - image: hnminh/saleor-api:kms
+        - image: hnminh/saleor-api:kms-test
           name: saleor-api
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
               name: api
+            - containerPort: 9191
+              name: metrics
           env:
             - name: ENABLE_ACCOUNT_CONFIRMATION_BY_EMAIL
               value: '{{ .Values.saleor.confirmationByEmail }}'
