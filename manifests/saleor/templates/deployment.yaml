@@ -39,16 +39,11 @@ spec:
               value: '{{ .Values.saleor.debugToolBar }}'
             - name: DEBUG
               value: '{{ .Values.saleor.debug }}'
-            {{ if .Values.postgresql.enabled }}
-            - name: DATABASE_URL
-              value: postgres://{{ .Values.postgresql.postgresqlUsername }}:{{ .Values.postgresql.postgresqlPassword }}@{{.Release.Name}}-postgresql-headless.default:5432/postgres'
-            {{ else }}
             - name: DATABASE_URL
               value: '{{ .Values.saleor.databaseUrl }}'
-            {{ end }}
             {{ if .Values.redis.enabled }}
             - name: CACHE_URL
-              value: 'redis://{{.Release.Name}}-redis-headless.default:6379/0'
+              value: 'redis://{{.Release.Name}}-redis-master.{{.Release.Namespace}}:6379/0'
             {{ else }}
             - name: CACHE_URL
               value: '{{ .Values.saleor.redisUrl }}'

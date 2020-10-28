@@ -5,14 +5,8 @@ dependencies:
 - name: nginx-ingress-controller
   repository: https://charts.bitnami.com/bitnami
   version: 5.6.8
-- name: nfs-client-provisioner
-  repository: https://kubernetes-charts.storage.googleapis.com
-  version: 1.2.9
-- name: postgresql
-  repository: https://charts.bitnami.com/bitnami
-  version: 9.8.2
 - name: redis
   repository: https://charts.bitnami.com/bitnami
   version: 11.1.1
-digest: sha256:f91ea6816316037e5ef5288050f7bc3f3af4a11d336e8e342dc9bcbc1a89b326
-generated: "2020-10-22T20:27:25.597757+07:00"
+digest: sha256:912e38800d16da95a803cb452fd7ad134df169cbe508d32a2f1d19518ae41c7b
+generated: "2020-10-28T23:12:17.324711+07:00"

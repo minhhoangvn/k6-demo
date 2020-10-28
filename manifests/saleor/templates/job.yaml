@@ -27,12 +27,14 @@ spec:
               value: 'True'
             - name: DEBUG
               value: 'True'
-            {{ if .Values.postgresql.enabled }}
-            - name: DATABASE_URL
-              value: postgres://{{ .Values.postgresql.postgresqlUsername }}:{{ .Values.postgresql.postgresqlPassword }}@{{.Release.Name}}-postgresql-headless.default:5432/postgres'
-            {{ else }}
             - name: DATABASE_URL
               value: '{{ .Values.saleor.databaseUrl }}'
+            {{ if .Values.redis.enabled }}
+            - name: CACHE_URL
+              value: 'redis://{{.Release.Name}}-redis-master.{{.Release.Namespace}}:6379/0'
+            {{ else }}
+            - name: CACHE_URL
+              value: '{{ .Values.saleor.redisUrl }}'
             {{ end }}
             - name: ALLOWED_CLIENT_HOSTS
               value: '{{ .Values.saleor.allowHosts }}, {{.Release.Name}}-saleor-dashboard, {{.Release.Name}}-saleor-storefront'

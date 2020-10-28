@@ -36,20 +36,6 @@ dependencies:
     tags:
       - nginx-ingress-controller
       - startup-infrastructure
-  - name: nfs-client-provisioner
-    version: 1.2.9
-    repository: https://kubernetes-charts.storage.googleapis.com
-    condition: nfs-client-provisioner.enabled, global.nfs-client-provisioner.enabled
-    tags:
-      - nfs-client-provisioner
-      - startup-infrastructure
-  - name: postgresql
-    version: 9.8.2
-    repository: https://charts.bitnami.com/bitnami
-    condition: postgresql.enabled, global.postgresql.enabled
-    tags:
-      - postgresql
-      - startup-infrastructure
   - name: redis
     version: 11.1.1
     repository: https://charts.bitnami.com/bitnami

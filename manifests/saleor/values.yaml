@@ -3,10 +3,10 @@
 ###############################################################
 saleor:
   databaseUrl: 'postgres://postgres:Coe@2020@coe-postgresql-headless.default:5432/saleor'
-  redisUrl: 'redis://coe-redis-headless.default:6379/0'
+  redisUrl: 'redis://coe-redis-master.default:6379/0'
   superUserPassword: 'Coe@2020'
   secretKey: 'Coe@2020'
-  allowHosts: 'localhost, 127.0.0.1, 0.0.0.0, 192.168.10.69, saleor.testing.coe.com,saleor-dashboard.testing.coe.com,saleor-storefront.testing.coe.com'
+  allowHosts: 'localhost, 127.0.0.1, 0.0.0.0, 192.168.10.69, saleor.testing.coe.com, saleor-dashboard.testing.coe.com, saleor-storefront.testing.coe.com'
   apiIngress: 'saleor.testing.coe.com'
   dashboardIngress: 'saleor-dashboard.testing.coe.com'
   storefrontIngress: 'saleor-storefront.testing.coe.com'
@@ -23,7 +23,7 @@ pgadmin4:
     password: 'Coe@2020'
   persistentVolume:
     enabled: true
-    storageClass: 'default'
+    storageClass: 'nfs'
     size: 5Gi
     accessMode: ReadWriteOnce
   resources:
@@ -95,75 +95,13 @@ nginx-ingress-controller:
       requests:
         cpu: 100m
         memory: 128Mi
-###############################################################
-#################### NFS Client ###############################
-###############################################################
-nfs-client-provisioner:
-  enabled: false
-  nfs:
-    server: 192.168.1.1
-    path: /mnt/sharedfolder
-  storageClass:
-    create: true
-    provisionerName: nfs-provision
-    defaultClass: true
-    name: default
-    allowVolumeExpansion: true
-    reclaimPolicy: Delete
-    archiveOnDelete: true
-    accessModes: ReadWriteOnce
-  rbac:
-    create: false
-  serviceAccount:
-    create: true
-  resources:
-    limits:
-      cpu: 200m
-      memory: 512Mi
-    requests:
-      cpu: 200m
-      memory: 256Mi
-###############################################################
-#################### Postgresql ###############################
-###############################################################
-postgresql:
-  enabled: false
-  image:
-    debug: true
-  global:
-    postgresql:
-      postgresqlPassword: 'Coe@2020'
-    storageClass: 'default'
-  postgresqlPostgresPassword: 'Coe@2020'
-  postgresqlUsername: 'postgres'
-  postgresqlPassword: 'Coe@2020'
-  persistence:
-    enabled: true
-    storageClass: 'default'
-    size: 25Gi
-  resources:
-    limits:
-      cpu: 500m
-      memory: 2Gi
-    requests:
-      cpu: 500m
-      memory: 1Gi
-  metrics:
-    serviceMonitor:
-      enabled: true
-      additionalLabels:
-        scrape-metric: 'true'
-  livenessProbe:
-    enabled: false
-  readinessProbe:
-    enabled: false
 ##############################################################
 ################### Redis ####################################
 ##############################################################
 redis:
   enabled: false
   global:
-    storageClass: 'default'
+    storageClass: 'nfs'
   usePassword: false
   metrics:
     enabled: true
@@ -185,7 +123,7 @@ redis:
     #disableCommands: ["FLUSHDB", "FLUSHALL"]
     disableCommands: []
     persistence:
-      storageClass: 'default'
+      storageClass: 'nfs'
     livenessProbe:
       enabled: false
     readinessProbe:
@@ -199,7 +137,7 @@ redis:
         memory: 256Mi
   slave:
     persistence:
-      storageClass: 'default'
+      storageClass: 'nfs'
     livenessProbe:
       enabled: false
     readinessProbe:
@@ -215,7 +153,7 @@ redis:
 #################### Prometheus Stack ###############################
 ###############################################################
 kube-prometheus-stack:
-  enabled: true
+  enabled: false
   commonLabels:
     scrape-metric: 'true'
   alertmanager:
@@ -441,7 +379,7 @@ kube-prometheus-stack:
 #################### Loki #####################################
 ###############################################################
 loki-stack:
-  enabled: true
+  enabled: false
   loki:
     ingress:
       enabled: true
