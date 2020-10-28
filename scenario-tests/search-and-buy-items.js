@@ -7,8 +7,9 @@ var search = require('../services/search-items/index.js');
 var select = require('../services/select-items/index.js');
 var account = require('../services/create-accounts/index.js');
 
-var ITERATION = 10;
-var VUs = 10;
+var ITERATION = 2;
+var DURATION = '8h';
+var VUs = 100;
 var thresholdConfig = {
   'Content OK': ['rate > 0.95'],
   // scenario 1
@@ -86,8 +87,10 @@ var waitingTimingTrendRegister = new Trend('check_waiting_timing_register');
 
 var buyItemWithUnregisterUserTestScenario = {
   exec: 'buyItemWithUnregisterUser',
-  executor: 'per-vu-iterations',
-  iterations: ITERATION,
+  // executor: 'per-vu-iterations',
+  executor: 'constant-vus',
+  duration: DURATION,
+  //iterations: ITERATION,
   vus: VUs,
   startTime: '0s',
   tags: { scenario_name: 'unregister_user' },
@@ -95,8 +98,10 @@ var buyItemWithUnregisterUserTestScenario = {
 
 var registerUserTestScenario = {
   exec: 'registerNewAccount',
-  executor: 'per-vu-iterations',
-  iterations: ITERATION,
+  // executor: 'per-vu-iterations',
+  executor: 'constant-vus',
+  duration: DURATION,
+  //iterations: ITERATION,
   vus: VUs,
   startTime: '0s',
   tags: { scenario_name: 'register_new_account' },
