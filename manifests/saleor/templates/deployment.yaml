@@ -2,16 +2,23 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: '{{.Release.Name}}-saleor-api'
+  # annotations:
+  #   "sidecar.jaegertracing.io/inject": "true" 
   labels:
     app: '{{.Release.Name}}-saleor'
     service: '{{.Release.Name}}-saleor-api'
 spec:
-  replicas: 4
-  serviceName: '{{.Release.Name}}-saleor-api'
+  replicas: 2
   selector:
     matchLabels:
       app: '{{.Release.Name}}-saleor'
       service: '{{.Release.Name}}-saleor-api'
+  serviceName: '{{.Release.Name}}-saleor-api-headless'
+  # strategy:
+  #   rollingUpdate:
+  #     maxSurge: 1
+  #     maxUnavailable: 0
+  #   type: RollingUpdate
   updateStrategy:
     type: RollingUpdate
   template:
@@ -22,8 +29,60 @@ spec:
     spec:
       restartPolicy: Always
       containers:
-        - image: hnminh/saleor-api:kms-test
+        - name: jaeger-agent
+          image: jaegertracing/jaeger-agent:1.20.0  # The agent version should match the operator version
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5775
+              name: zk-compact-trft
+              protocol: UDP
+            - containerPort: 5778
+              name: config-rest
+              protocol: TCP
+            - containerPort: 6831
+              name: jg-compact-trft
+              protocol: UDP
+            - containerPort: 6832
+              name: jg-binary-trft
+              protocol: UDP
+            - containerPort: 14271
+              name: admin-http
+              protocol: TCP
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.hostIP
+          args:
+            - --log-level=debug
+            - --jaeger.tags=cluster=undefined,deployment.name=myapp,pod.namespace=saleor,pod.name=${POD_NAME:},host.ip=${HOST_IP:},pod.io=${POD_IP:}
+            - --processor.jaeger-binary.server-max-packet-size=100000
+            - --processor.jaeger-binary.server-queue-size=2000
+            - --processor.jaeger-binary.server-socket-buffer-size=16000
+            - --processor.jaeger-compact.server-max-packet-size=100000
+            - --processor.jaeger-compact.server-queue-size=2000
+            - --processor.jaeger-compact.server-socket-buffer-size=16000
+            - --reporter.grpc.retry.max=5
+            - --reporter.grpc.host-port=dns:///jaeger-collector.default.svc:14250
+            - --reporter.type=grpc
+            - --reporter.grpc.tls.skip-host-verify=true
+        - image: hnminh/saleor-api:kms
           name: saleor-api
+          lifecycle:
+            postStart:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 5"]
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
@@ -31,10 +90,18 @@ spec:
             - containerPort: 9191
               name: metrics
           env:
+            - name: JAEGER_AGENT_HOST
+              value: 'localhost'
+            - name: JAEGER_AGENT_PORT
+              value: '6831'
+            - name: JAEGER_LOGGING
+              value: 'True'
             - name: ENABLE_ACCOUNT_CONFIRMATION_BY_EMAIL
               value: '{{ .Values.saleor.confirmationByEmail }}'
             - name: ALLOWED_GRAPHQL_ORIGINS
               value: '*'
+            - name: PLAYGROUND_ENABLED
+              value: '{{ .Values.saleor.debugToolBar }}'
             - name: ENABLE_DEBUG_TOOLBAR
               value: '{{ .Values.saleor.debugToolBar }}'
             - name: DEBUG

@@ -1,3 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: '{{.Release.Name}}-saleor'
+    service: '{{.Release.Name}}-saleor-api'
+  name: '{{.Release.Name}}-saleor-api-headless'
+spec:
+  ports:
+    - name: 'api'
+      port: 8000
+      targetPort: 8000
+    - name: 'metrics'
+      port: 9191
+      targetPort: 9191
+  selector:
+    app: '{{.Release.Name}}-saleor'
+    service: '{{.Release.Name}}-saleor-api'
+  type: ClusterIP
+  clusterIP: None
 ---
 apiVersion: v1
 kind: Service
@@ -18,7 +38,6 @@ spec:
     app: '{{.Release.Name}}-saleor'
     service: '{{.Release.Name}}-saleor-api'
   type: ClusterIP
-  clusterIP: None
 ---
 apiVersion: v1
 kind: Service
